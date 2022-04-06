@@ -1,0 +1,62 @@
+body {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  margin: 0;
+  background-color: #000000;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.game {
+  padding: 10px;
+  background-color: cornflowerblue;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.corner {
+  width: 20px;
+  height: 20px;
+  margin: 20px;
+}
+
+.edge {
+  border: 1px solid black;
+  border-radius: 5px;
+  width: 40px;
+  height: 40px;
+  margin: 10px;
+}
+
+.edge:-moz-drag-over {
+  border: 0px;
+  outline: 10px solid greenyellow;
+}
+
+.letter {
+  display: table-cell;
+  vertical-align: middle;
+  border-radius: 5px;
+  background-color: greenyellow;
+  font-size: 40px;
+  text-align: center;
+  border: 1px solid black;
+  width: 60px;
+  height: 60px;
+  cursor: pointer;
+}
+
+.buttonBox {
+  display: flex;
+  padding: 20px;
+  align-self: stretch;
+  justify-content: space-around;
+}
