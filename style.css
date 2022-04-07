@@ -17,6 +17,7 @@ main {
 
 .game {
   padding: 10px;
+  border-radius: 10px;
   background-color: cornflowerblue;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -54,9 +55,32 @@ main {
   cursor: pointer;
 }
 
+.highlighted {
+  border: 1px solid orange;
+}
+
 .buttonBox {
   display: flex;
   padding: 20px;
-  align-self: stretch;
-  justify-content: space-around;
+/*   align-self: stretch; */
+}
+
+.wordButton {
+  background-color: orange;
+  border-radius: 20px;
+  margin: 10px 20px;
+  padding: 0px 20px;
+  font-size: 40px;
+  min-height: 2em;
+  min-width: 3em;
+}
+
+.cancelButton {
+  background-color: cornflowerblue;
+  border-radius: 20px;
+  margin: 10px 20px;
+  padding: 0px 20px;
+  font-size: 40px;
+  min-height: 2em;
+  justify-self: right;
 }
