@@ -4,19 +4,22 @@ const MIDDLE = 0;
 const EDGE = 1;
 const CORNER = 2;
 const styles = ["letter", "edge", "corner"];
-
-//TODO: Move this into Tile?
 const game = document.querySelector('.game');
 const wordList = document.querySelector('.wordList');
 const wordCount = document.querySelector('.wordCount');
 
-console.log('Reading dictionary...');
+// Seeded random number generator by David bau
+const date = new Date();
+const dateString = '' + date.getFullYear() +
+                   '-' + date.getMonth() +
+                   '-' + date.getDate();
+const rng = new Math.seedrandom(dateString);
 
 // Populate our dictionary
 let dictionary = [];
 fetch('./3of6game.txt')
   .then(response => response.text())
-  .then(text => dictionary = text.split('\r\n'))
+  .then(text => dictionary = text.split(/\r?\n/))
   .catch(error => console.log(error));
   
 // Define our letter frequencies
@@ -51,7 +54,7 @@ const letter_freqs = [
 
 // Generate a random letter according to the above frequencies
 function randomLetter() {
-  let random_weight = Math.random();
+  let random_weight = rng();
   
   const { letter } = letter_freqs.find(
     ({ weight }) => (random_weight -= weight) < 0
