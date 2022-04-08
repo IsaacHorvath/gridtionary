@@ -298,6 +298,8 @@ function shiftTiles() {
             tiles[row][5].emptyBorder(EDGE);
         }
     }
+    score -= 5;
+    wordCount.innerHTML = score;
 }
 
 // Let the main function know where the active tile is

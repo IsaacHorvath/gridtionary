@@ -17,3 +17,4 @@ to serve the game on `localhost:8000`.
 [x] Fix letter distribution
 [ ] Come up with scoring method
 [ ] Nice CSS animations
+[ ] Mobile replacement for drag and drop
