@@ -13,7 +13,8 @@ Clone this repository, then do:
 to serve the game on `localhost:8000`.
 
 ### Todo
-[x] Implement word selection
-[x] Fix letter distribution
-[ ] Come up with scoring method
-[ ] Nice CSS animations
+
+[x] Implement word selection  
+[x] Fix letter distribution  
+[ ] Come up with scoring method  
+[ ] Nice CSS animations  
