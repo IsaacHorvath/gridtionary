@@ -7,22 +7,18 @@ const styles = ["letter", "edge", "corner"];
 
 //TODO: Move this into Tile?
 const game = document.querySelector('.game');
+const wordList = document.querySelector('.wordList');
+const wordCount = document.querySelector('.wordCount');
 
-function loc(row, col) {
-        if (row > 0 && row < 5) {
-            if (col > 0 && col < 5)
-                return MIDDLE;
-            else
-                return EDGE;
-        }
-        else {
-            if (col > 0 && col < 5)
-                return EDGE;
-            else
-                return CORNER;
-        }
-}
+console.log('Reading dictionary...');
 
+// Populate our dictionary
+let dictionary = [];
+fetch('./3of6game.txt')
+  .then(response => response.text())
+  .then(text => dictionary = text.split('\r\n'))
+  .catch(error => console.log(error));
+  
 // Define our letter frequencies
 const letter_freqs = [
     { letter: 'a', weight: 0.08167 },
@@ -53,6 +49,7 @@ const letter_freqs = [
     { letter: 'z', weight: 0.00074 }
 ];
 
+// Generate a random letter according to the above frequencies
 function randomLetter() {
   let random_weight = Math.random();
   
@@ -61,6 +58,22 @@ function randomLetter() {
   );
 
   return letter;
+}
+
+// Return the location type of a tile based on coords
+function loc(row, col) {
+        if (row > 0 && row < 5) {
+            if (col > 0 && col < 5)
+                return MIDDLE;
+            else
+                return EDGE;
+        }
+        else {
+            if (col > 0 && col < 5)
+                return EDGE;
+            else
+                return CORNER;
+        }
 }
 
 class Tile {
@@ -166,15 +179,22 @@ class Tile {
 
 
 const tiles = [];
-let word = '';
-let word_coords = [];
-
 let active_row = 1;
 let active_col = 0;
-// Let the main function know where the active tile is
-function setActive(row, col) {
-    active_row = row;
-    active_col = col;
+let word = '';
+let word_coords = [];
+const found_words = [];
+let score = 0;
+
+// Populate the whole grid, add style, and generate a letter for each of the middle tiles
+for (row=0;row<6;row++) {
+    const tile_row = [];
+    for (col=0;col<6;col++) {
+        const l = loc(row, col);
+        const tile = new Tile(row, col, setActive, shiftTiles, selectTile);
+        tile_row.push(tile);
+    }
+    tiles.push(tile_row);
 }
 
 function addTile(c, row, col) {
@@ -209,6 +229,7 @@ function selectTile(c, row, col) {
     return false;
 }
 
+// Clear the word button and take the letters off the chain
 function clearWord() {
     word_coords = [];
     word = '';
@@ -221,9 +242,25 @@ function clearWord() {
 }
 document.querySelector('.cancelButton').addEventListener('click', clearWord);
 
+// Check if the word in the button is in the dictionary
 function checkWord() {
-    
+    if (word.length > 2) {
+        console.log(`checkWord: ${word}`);
+        console.log(dictionary.includes(word));
+        if (dictionary.includes(word) &&
+            !found_words.includes(word)) {
+            new_word = document.createElement('span');
+            new_word.setAttribute('class', 'foundWord');
+            new_word.innerHTML = word;
+            wordList.appendChild(new_word);
+            found_words.push(word);
+            clearWord();
+            score++;
+            wordCount.innerHTML = score;
+        }
+    }
 }
+document.querySelector('.wordButton').addEventListener('click', checkWord);
 
 // Shift the active tile's row or column, putting it in the middle and creating a new active tile
 function shiftTiles() {
@@ -263,15 +300,10 @@ function shiftTiles() {
     }
 }
 
-// Populate the whole grid, add style, and generate a letter for each of the middle tiles
-for (row=0;row<6;row++) {
-    const tile_row = [];
-    for (col=0;col<6;col++) {
-        const l = loc(row, col);
-        const tile = new Tile(row, col, setActive, shiftTiles, selectTile);
-        tile_row.push(tile);
-    }
-    tiles.push(tile_row);
+// Let the main function know where the active tile is
+function setActive(row, col) {
+    active_row = row;
+    active_col = col;
 }
 
 

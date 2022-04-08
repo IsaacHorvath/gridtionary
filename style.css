@@ -59,7 +59,7 @@ main {
   border: 1px solid orange;
 }
 
-.buttonBox {
+.topBox {
   display: flex;
   padding: 20px;
 /*   align-self: stretch; */
@@ -67,6 +67,7 @@ main {
 
 .wordButton {
   background-color: orange;
+  border-color: orange;
   border-radius: 20px;
   margin: 10px 20px;
   padding: 0px 20px;
@@ -77,10 +78,40 @@ main {
 
 .cancelButton {
   background-color: cornflowerblue;
+  border-color: cornflowerblue;
   border-radius: 20px;
   margin: 10px 20px;
   padding: 0px 20px;
   font-size: 40px;
   min-height: 2em;
   justify-self: right;
+}
+
+.scoreBox {
+  background-color: cornflowerblue;
+  border-radius: 20px;
+  padding: 10px 20px;
+  margin: 10px 20px;
+  text-align: center;
+}
+
+.label {
+  
+}
+
+.wordCount {
+  font-size: 2em;
+}
+
+.wordList {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 20px;
+}
+
+.foundWord {
+  background-color: orange;
+  border-radius: 10px;
+  margin: 10px 10px;
+  padding: 10px;
 }

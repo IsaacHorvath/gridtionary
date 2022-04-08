@@ -4,8 +4,16 @@ Gridtionary is a simple browser game where you try to find words in a four by fo
 
 I'm making this to help brush up on my Javascript. Feel free to suggest features!
 
-## Todo
-- Implement word selection
-- Fix letter distribution
-- Come up with scoring
-- Nice CSS animations
+Many thanks to [SCOWL](http://wordlist.aspell.net/) for the 3of6game en_ca wordlist.
+
+### Running
+
+Clone this repository, then do:  
+`python -m http.server`  
+to serve the game on `localhost:8000`.
+
+### Todo
+[x] Implement word selection
+[x] Fix letter distribution
+[ ] Come up with scoring method
+[ ] Nice CSS animations

@@ -3,17 +3,29 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Canvas</title>
+        <title>Gridtionary</title>
         <script src="script.js" defer></script>
         <link href="style.css" rel="stylesheet">
+        <link rel="icon" href="favicon.png" type="image/x-icon">
     </head>
     <body>
         <main>
-            <span class="buttonBox">
+            <div class="topBox">
+                <div class="scoreBox">
+                    <span>
+                        <div class="label">Words:</div>
+                        <div class="wordCount">0</div>
+                    </span>
+                    <!-- span>
+                        <div class="label">Score:</div>
+                        <div class="wordCount">0</div>
+                    </span -->
+                </div>
                 <button class="wordButton"></button>
                 <button class="cancelButton">✖️</button>
-            </span>
+            </div>
             <div class="game"></div>
+            <div class="wordList"></div>
         </main>
     </body>
 </html>
