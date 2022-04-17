@@ -1,5 +1,5 @@
 // Some game parameters
-const SCORE_DEC = 10;  // How much your score goes down by
+const SHIFT_COST = 10;  // How much your score goes down by
 
 // Some actually constant consts
 const cols = "ABCDEF";
@@ -276,7 +276,7 @@ document.querySelector('.wordButton').addEventListener('click', checkWord);
 
 // Shift the active tile's row or column, putting it in the middle and creating a new active tile
 function shiftTiles() {
-    if (word_coords.length === 0) {
+    if (word_coords.length === 0 && score >= SHIFT_COST) {
         const row = active_row;
         const col = active_col;
         
@@ -319,7 +319,7 @@ function shiftTiles() {
             tiles[row][5].emptyBorder(EDGE);
         }
     }
-    score -= SCORE_DEC;
+    score -= SHIFT_COST;
     if (score < 0)
         score = 0;
     wordCount.innerHTML = score;
@@ -329,11 +329,6 @@ function shiftTiles() {
 function setActive(row, col) {
     active_row = row;
     active_col = col;
-}
-
-
-function mainLoop() {
-    
 }
 
 
