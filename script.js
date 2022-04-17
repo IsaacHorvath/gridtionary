@@ -1,5 +1,6 @@
 // Some game parameters
-const SHIFT_COST = 10;  // How much your score goes down by
+const SHIFT_COST = 10;      // How much your score goes down by
+const MIN_WORD_LENGTH = 3;  // How long the smallest word can be
 
 // Some actually constant consts
 const cols = "ABCDEF";
@@ -258,17 +259,38 @@ document.querySelector('.cancelButton').addEventListener('click', clearWord);
 
 // Check if the word in the button is in the dictionary
 function checkWord() {
-    if (word.length > 2) {
-        if (dictionary.includes(word) &&
-            !found_words.includes(word)) {
-            new_word = document.createElement('span');
-            new_word.setAttribute('class', 'foundWord');
-            new_word.innerHTML = word;
-            wordList.appendChild(new_word);
-            found_words.push(word);
-            score += word.length;
-            wordCount.innerHTML = score;
-            clearWord();
+    wlen = word.length
+    if (wlen >= Math.max(MIN_WORD_LENGTH, 1)) {
+        if (!found_words.includes(word)) {
+            if (dictionary.includes(word)) {
+                new_word = document.createElement('span');
+                new_word.setAttribute('class', 'foundWord');
+                new_word.setAttribute('id', `${word}-word`);
+                new_word.addEventListener('animationend', () => {
+                    already_found.classList.remove('alreadyFoundWord');
+                });
+                new_word.innerHTML = word;
+                wordList.appendChild(new_word);
+                found_words.push(word);
+                score += wlen;
+                wordCount.innerHTML = score;
+                
+                // A fun little score animation!
+                scoreIncrease = document.createElement('div');
+                scoreIncrease.setAttribute('class', 'scoreIncrease');
+                scoreIncrease.addEventListener('animationend', () => {
+                    scoreIncrease.remove(); 
+                });
+                scoreIncrease.innerHTML = '+' + wlen;
+                document.body.appendChild(scoreIncrease);
+                
+                
+                clearWord();
+            }
+        }
+        else {
+            already_found = document.getElementById(`${word}-word`);
+            already_found.classList.add('alreadyFoundWord');
         }
     }
 }
@@ -330,6 +352,27 @@ function setActive(row, col) {
     active_row = row;
     active_col = col;
 }
+
+// Add the score animation
+wordCountPos = wordCount.getBoundingClientRect();
+startLeft = wordCountPos.left + 40;
+startTop = wordCountPos.top - 40;
+endTop = parseInt(startTop/2);
+const css = window.document.styleSheets[0];
+css.insertRule(`
+@keyframes floatUp {
+  0% {
+    left: ${startLeft}px;
+    top: ${startTop}px;
+    color: greenyellow;
+  }
+  100% {
+    left: ${startLeft}px;
+    top: ${endTop}px;
+    color: rgb(64, 64, 64, 0);
+  }
+}
+`, css.cssRules.length);
 
 
 
