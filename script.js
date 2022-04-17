@@ -1,3 +1,6 @@
+// Some game parameters
+const SCORE_DEC = 10;  // How much your score goes down by
+
 // Some actually constant consts
 const cols = "ABCDEF";
 const MIDDLE = 0;
@@ -91,9 +94,17 @@ class Tile {
         this.drop = this.onDrop.bind(this);
         this.click = this.onClick.bind(this);
         
-        // Create the element with id, and init if 
+        // Create the element with id
         this.element = document.createElement('span');
         this.element.setAttribute('id', `${cols[col]}${row}`);
+        
+        // Add the animation end listeners
+        this.element.addEventListener('animationend', () => {
+            this.element.classList.remove('letterDownShift');
+            this.element.classList.remove('letterUpShift');
+            this.element.classList.remove('letterLeftShift');
+            this.element.classList.remove('letterRightShift');
+        });
         
         // Initialize edges, middle, and active tile
         this.emptyBorder(l);
@@ -248,8 +259,6 @@ document.querySelector('.cancelButton').addEventListener('click', clearWord);
 // Check if the word in the button is in the dictionary
 function checkWord() {
     if (word.length > 2) {
-        console.log(`checkWord: ${word}`);
-        console.log(dictionary.includes(word));
         if (dictionary.includes(word) &&
             !found_words.includes(word)) {
             new_word = document.createElement('span');
@@ -257,9 +266,9 @@ function checkWord() {
             new_word.innerHTML = word;
             wordList.appendChild(new_word);
             found_words.push(word);
-            clearWord();
-            score++;
+            score += word.length;
             wordCount.innerHTML = score;
+            clearWord();
         }
     }
 }
@@ -274,34 +283,45 @@ function shiftTiles() {
         //TODO: Get rid of redundancy, maybe using a filter
         if (row === 0) {
             tiles[5][col].activeTile(tiles[4][col].element.innerHTML);
+            tiles[5][col].element.classList.add('letterDownShift');
             for (r=4;r>0;r--) {
                 tiles[r][col].element.innerHTML = tiles[r-1][col].element.innerHTML;
+                tiles[r][col].element.classList.add('class', 'letterDownShift');
             }
             tiles[0][col].emptyBorder(EDGE);
         }
         else if (row === 5) {
             tiles[0][col].activeTile(tiles[1][col].element.innerHTML);
+            tiles[0][col].element.classList.add('letterUpShift');
             for (r=1;r<5;r++) {
                 tiles[r][col].element.innerHTML = tiles[r+1][col].element.innerHTML;
+                tiles[r][col].element.classList.add('class', 'letterUpShift');
             }
             tiles[5][col].emptyBorder(EDGE);
+            
         }
         else if (col === 0) {
             tiles[row][5].activeTile(tiles[row][4].element.innerHTML);
+            tiles[row][5].element.classList.add('letterRightShift');
             for (c=4;c>0;c--) {
                 tiles[row][c].element.innerHTML = tiles[row][c-1].element.innerHTML;
+                tiles[row][c].element.classList.add('class', 'letterRightShift');
             }
             tiles[row][0].emptyBorder(EDGE);
         }
         else if (col === 5) {
             tiles[row][0].activeTile(tiles[row][1].element.innerHTML);
+            tiles[row][0].element.classList.add('letterLeftShift');
             for (c=1;c<5;c++) {
                 tiles[row][c].element.innerHTML = tiles[row][c+1].element.innerHTML;
+                tiles[row][c].element.classList.add('class', 'letterLeftShift');
             }
             tiles[row][5].emptyBorder(EDGE);
         }
     }
-    score -= 5;
+    score -= SCORE_DEC;
+    if (score < 0)
+        score = 0;
     wordCount.innerHTML = score;
 }
 

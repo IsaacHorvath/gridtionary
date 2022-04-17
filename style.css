@@ -57,6 +57,71 @@ main {
   height: 60px;
   cursor: pointer;
   user-select: none;
+  position: relative;
+}
+
+@keyframes downShift {
+  0% {
+    top: -60px;
+    background-color: white;
+  }
+  100% {
+    top: 0px;
+    background-color: greenyellow;
+  }
+}
+
+@keyframes upShift {
+  0% {
+    top: 60px;
+    background-color: white;
+  }
+  100% {
+    top: 0px;
+    background-color: greenyellow;
+  }
+}
+
+@keyframes rightShift {
+  0% {
+    left: -60px;
+    background-color: white;
+  }
+  100% {
+    left: 0px;
+    background-color: greenyellow;
+  }
+}
+
+@keyframes leftShift {
+  0% {
+    left: 60px;
+    background-color: white;
+  }
+  100% {
+    left: 0px;
+    background-color: greenyellow;
+  }
+}
+
+.letterDownShift {
+  animation: downShift;
+  animation-duration: 1s;
+}
+
+.letterUpShift {
+  animation: upShift;
+  animation-duration: 1s;
+}
+
+.letterRightShift {
+  animation: rightShift;
+  animation-duration: 1s;
+}
+
+.letterLeftShift {
+  animation: leftShift;
+  animation-duration: 1s;
 }
 
 .highlighted {
