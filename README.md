@@ -17,7 +17,9 @@ cd gridtionary
 ```
 
 And then serve it with:  
-`python -m http.server`  
+```
+python -m http.server  
+```
 
 Then go to `localhost:8000` in your browser.
 
