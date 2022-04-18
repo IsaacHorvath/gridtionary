@@ -100,8 +100,6 @@ class Tile {
         this.col = col;
         this.letter = letter;
         
-        console.log(`constructing... row: ${row}\tcol: ${col}\tlet: ${this.letter}`);
-        
         // Binds are necessary to have consistent event callbacks to remove
         this.dragEnd = this.onDragEnd.bind(this);
         this.dragOver = this.onDragOver.bind(this);
@@ -225,7 +223,6 @@ if (!refresh) {
 for (row=0;row<6;row++) {
     for (col=0;col<6;col++) {
         const active = (row == player.active_row && col == player.active_col) ? true : false;
-        console.log(player.tiles[row][col]);
         const letter = refresh ? '' : player.tiles[row][col].letter;
         const tile = new Tile(row, col, active, setActive, shiftTiles, selectTile, letter);
         player.tiles[row][col] = tile;
@@ -437,7 +434,6 @@ document.querySelector('.hideHelp').addEventListener('click', (e) => {
 function setCookie(key, value) {
     const valueString = JSON.stringify(value);
     document.cookie = `${key}=${valueString}; SameSite=Strict`;
-    console.log(`Setting cookie ${key}=${valueString}`);
 }
 
 function getCookie(key) {
