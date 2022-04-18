@@ -168,7 +168,7 @@ class Tile {
     }
     
     onDragEnd(e) {
-        if (e.dataTransfer.dropEffect === 'move') {
+        if (e.dataTransfer.dropEffect != 'none') {
             this.emptyBorder(loc(this.row, this.col));
             this.shiftTiles();
         }
@@ -342,11 +342,11 @@ function shiftTiles() {
             }
             tiles[row][5].emptyBorder(EDGE);
         }
+        score -= SHIFT_COST;
+        if (score < 0)
+            score = 0;
+        wordCount.innerHTML = score;
     }
-    score -= SHIFT_COST;
-    if (score < 0)
-        score = 0;
-    wordCount.innerHTML = score;
 }
 
 // Let the main function know where the active tile is
@@ -379,12 +379,12 @@ css.insertRule(`
 // Add the help box
 helpText = document.createElement('span');
 helpText.innerHTML = `
-<h2>Welcome!</h2>
+<h2>Welcome to Gridtionary!</h2>
 <p>Gridtionary is a simple game with complex and open-ended solutions.</p>
 <p>You start with a 4x4 inner grid of random letters, and an active tile on the edge. Your aim is to find as many English words as possible in this grid of letters. You build words by selecting adjacent letters one by one - adjacent in this case means left, right, below, above, <em>or diagonal</em> to the last letter selected. You can only use each letter in the grid once per word.</p>
 <p>Each time you find a word, hit that orange button above the grid. If it's a valid word, and it's at least ${MIN_WORD_LENGTH} letters long, it'll be added to your list. You score a point for each letter in the word! You can only add each unique word once.</p>
 <p>Once you've found as many words as you can, take a look at the active tile on the side. If you drag it to any of the open edge spots outside the grid, it will shift that row or column of letters over, and you'll get a rearranged grid with a new active tile on the other side. This can help you find many more words! But be careful - each shift will cost you ${SHIFT_COST} points. That means that on average, you'll want to make sure you can find at least ${parseInt(Math.ceil(SHIFT_COST/MIN_WORD_LENGTH))} words of minimum length each time you shift the grid.</p>
-<p>The grid of letters will refresh every day, and everyone playing Gridtionary starts with the same grid! There is no end to the puzzle each day. Just find as many words as you can, be careful when you shift, and have fun!</p>
+<p>The grid of letters will refresh every day, and everyone playing Gridtionary starts with the same grid. There is no end to the puzzle each day. Just find as many words as you can, be careful when you shift, and have fun!</p>
 `;
 helpBox.appendChild(helpText);
 helpButton.addEventListener('click', (e) => {
@@ -395,4 +395,3 @@ document.querySelector('.hideHelp').addEventListener('click', (e) => {
     e.stopPropagation();
     helpBox.close();
 });
-
