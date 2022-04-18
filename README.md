@@ -8,15 +8,31 @@ Many thanks to [SCOWL](http://wordlist.aspell.net/) for the 3of6game en_ca wordl
 
 ### Running
 
-Clone this repository, then do:  
+The master branch is now hosted on [my GitHub Page](https://isaachorvath.github.io/gridtionary/). Feel free to play there!
+
+If you'd like to host it on your own computer, clone the respository:  
+```
+git clone https://github.com/IsaacHorvath/gridtionary.git  
+cd gridtionary  
+```
+
+And then serve it with:  
 `python -m http.server`  
-to serve the game on `localhost:8000`.
+
+Then go to `localhost:8000` in your browser.
+
+If you don't have Python you can use any http server, e.g. for Rust fans:  
+```
+cargo install microserver  
+microserver  
+```
+
 
 ### Todo
 
-[x] Implement word selection  
-[x] Fix letter distribution  
-[ ] Come up with scoring method  
-[ ] Nice CSS animations  
-[ ] Mobile replacement for drag and drop  
+- [x] Implement word selection  
+- [x] Fix letter distribution  
+- [x] Come up with scoring method  
+- [x] Nice CSS animations  
+- [ ] Mobile replacement for drag and drop  
 
