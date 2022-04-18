@@ -14,14 +14,22 @@ const wordCount = document.querySelector('.wordCount');
 const helpBox = document.querySelector('.helpBox');
 const helpButton = document.querySelector('.helpButton');
 
-// Seeded random number generator by David bau
+// Check the date - if it's new, regenerate the game)
+// Seeded random number generator by David Bau
 const date = new Date();
 const dateString = '' + date.getFullYear() +
                    '-' + date.getMonth() +
                    '-' + date.getDate();
 const rng = new Math.seedrandom(dateString);
+const oldDate = getCookie('date');
+var refresh = false;
+if (dateString != oldDate) {
+    refresh = true;
+    setCookie('date', dateString);
+}
 
 // Populate our dictionary
+// TODO: Properly deal with this promise - maybe display a loading graphic until it loads
 var dictionary = [];
 fetch('./3of6game.txt')
   .then(response => response.text())
@@ -86,10 +94,13 @@ function loc(row, col) {
 }
 
 class Tile {
-    constructor(row, col, setActive, shiftTiles, selectTile) {
+    constructor(row, col, active, setActive, shiftTiles, selectTile, letter) {
         const l = loc(row, col);
         this.row = row;
         this.col = col;
+        this.letter = letter;
+        
+        console.log(`constructing... row: ${row}\tcol: ${col}\tlet: ${this.letter}`);
         
         // Binds are necessary to have consistent event callbacks to remove
         this.dragEnd = this.onDragEnd.bind(this);
@@ -113,7 +124,8 @@ class Tile {
         this.emptyBorder(l);
         if (l === MIDDLE) {
             // Middle tile - generate a random letter
-            const c = this.element.innerHTML = randomLetter();
+            if (this.letter === '') this.letter = randomLetter();
+            this.element.innerHTML = this.letter;
             this.element.setAttribute('class', 'letter');
             
             this.highlighted = false;
@@ -125,10 +137,10 @@ class Tile {
             this.setActive = setActive;
             this.shiftTiles = shiftTiles;
         }    
-        if (row === 1 && col === 0) {
+        if (active) {
             // Our starting active tile
-            const c = randomLetter();
-            this.activeTile(c);
+            if (letter === '') letter = randomLetter();
+            this.activeTile(letter);
         }
         
         // Add the tile to the DOM
@@ -151,8 +163,8 @@ class Tile {
         }
     }
     
-    activeTile(c) {
-        this.element.innerHTML = c;
+    activeTile(letter) {
+        this.letter = this.element.innerHTML = letter;
         this.element.setAttribute('class', 'letter');
         this.element.setAttribute('draggable', true);
         this.element.removeEventListener('dragenter', this.dragOver);
@@ -193,26 +205,42 @@ class Tile {
     }
 }
 
-
-
-const tiles = [];
-let active_row = 1;
-let active_col = 0;
-let word = '';
-let word_coords = [];
-const found_words = [];
-let score = 0;
-
-// Populate the whole grid, add style, and generate a letter for each of the middle tiles
-for (row=0;row<6;row++) {
-    const tile_row = [];
-    for (col=0;col<6;col++) {
-        const l = loc(row, col);
-        const tile = new Tile(row, col, setActive, shiftTiles, selectTile);
-        tile_row.push(tile);
-    }
-    tiles.push(tile_row);
+var word = '';
+var word_coords = [];
+var player = {
+    tiles: [...Array(6)].map(row => Array(6)),
+    active_row: 1,
+    active_col: 0,
+    found_words: [],
+    score: 0
+};
+if (!refresh) {
+    const cookie = getCookie('player');
+    if (cookie != null)
+        player = cookie;
+    else
+        refresh = true;
 }
+
+for (row=0;row<6;row++) {
+    for (col=0;col<6;col++) {
+        const active = (row == player.active_row && col == player.active_col) ? true : false;
+        console.log(player.tiles[row][col]);
+        const letter = refresh ? '' : player.tiles[row][col].letter;
+        const tile = new Tile(row, col, active, setActive, shiftTiles, selectTile, letter);
+        player.tiles[row][col] = tile;
+    }
+}
+
+if (!refresh) {
+    for (i=0;i<player.found_words.length;i++)
+        displayFoundWord(player.found_words[i]);
+    wordCount.innerHTML = player.score;
+}
+else {
+    setCookie('player', player);
+}
+
 
 function addTile(c, row, col) {
     word_coords.push([row, col]);
@@ -252,30 +280,34 @@ function clearWord() {
     word = '';
     for (row=0;row<6;row++) {
         for (col=0;col<6;col++) {
-            tiles[row][col].element.classList.remove('highlighted');
+            player.tiles[row][col].element.classList.remove('highlighted');
         }
     }
     document.querySelector('.wordButton').innerHTML = word;
 }
 document.querySelector('.cancelButton').addEventListener('click', clearWord);
 
+function displayFoundWord(w) {
+    const new_word = document.createElement('span');
+    new_word.setAttribute('class', 'foundWord');
+    new_word.setAttribute('id', `${w}-word`);
+    new_word.addEventListener('animationend', () => {
+        already_found.classList.remove('alreadyFoundWord');
+    });
+    new_word.innerHTML = w;
+    wordList.appendChild(new_word);
+}
+
 // Check if the word in the button is in the dictionary
 function checkWord() {
     wlen = word.length
     if (wlen >= Math.max(MIN_WORD_LENGTH, 1)) {
-        if (!found_words.includes(word)) {
+        if (!player.found_words.includes(word)) {
             if (dictionary.includes(word)) {
-                new_word = document.createElement('span');
-                new_word.setAttribute('class', 'foundWord');
-                new_word.setAttribute('id', `${word}-word`);
-                new_word.addEventListener('animationend', () => {
-                    already_found.classList.remove('alreadyFoundWord');
-                });
-                new_word.innerHTML = word;
-                wordList.appendChild(new_word);
-                found_words.push(word);
-                score += wlen;
-                wordCount.innerHTML = score;
+                displayFoundWord(word);
+                player.found_words.push(word);
+                player.score += wlen;
+                wordCount.innerHTML = player.score;
                 
                 // A fun little score animation!
                 scoreIncrease = document.createElement('div');
@@ -286,8 +318,8 @@ function checkWord() {
                 scoreIncrease.innerHTML = '+' + wlen;
                 document.body.appendChild(scoreIncrease);
                 
-                
                 clearWord();
+                setCookie('player', player);
             }
         }
         else {
@@ -300,59 +332,64 @@ document.querySelector('.wordButton').addEventListener('click', checkWord);
 
 // Shift the active tile's row or column, putting it in the middle and creating a new active tile
 function shiftTiles() {
-    if (word_coords.length === 0 && score >= SHIFT_COST) {
-        const row = active_row;
-        const col = active_col;
+    if (word_coords.length === 0 && player.score >= SHIFT_COST) {
+        const row = player.active_row;
+        const col = player.active_col;
         
         //TODO: Get rid of redundancy, maybe using a filter
         if (row === 0) {
-            tiles[5][col].activeTile(tiles[4][col].element.innerHTML);
-            tiles[5][col].element.classList.add('letterDownShift');
+            player.tiles[5][col].activeTile(player.tiles[4][col].element.innerHTML);
+            player.tiles[5][col].element.classList.add('letterDownShift');
             for (r=4;r>0;r--) {
-                tiles[r][col].element.innerHTML = tiles[r-1][col].element.innerHTML;
-                tiles[r][col].element.classList.add('class', 'letterDownShift');
+                player.tiles[r][col].letter = player.tiles[r][col].element.innerHTML = player.tiles[r-1][col].element.innerHTML;
+                player.tiles[r][col].element.classList.add('class', 'letterDownShift');
             }
-            tiles[0][col].emptyBorder(EDGE);
+            player.tiles[0][col].emptyBorder(EDGE);
+            player.active_row = 5;
         }
         else if (row === 5) {
-            tiles[0][col].activeTile(tiles[1][col].element.innerHTML);
-            tiles[0][col].element.classList.add('letterUpShift');
+            player.tiles[0][col].activeTile(player.tiles[1][col].element.innerHTML);
+            player.tiles[0][col].element.classList.add('letterUpShift');
             for (r=1;r<5;r++) {
-                tiles[r][col].element.innerHTML = tiles[r+1][col].element.innerHTML;
-                tiles[r][col].element.classList.add('class', 'letterUpShift');
+                player.tiles[r][col].letter = player.tiles[r][col].element.innerHTML = player.tiles[r+1][col].element.innerHTML;
+                player.tiles[r][col].element.classList.add('class', 'letterUpShift');
             }
-            tiles[5][col].emptyBorder(EDGE);
-            
+            player.tiles[5][col].emptyBorder(EDGE);
+            player.active_row = 0;
         }
         else if (col === 0) {
-            tiles[row][5].activeTile(tiles[row][4].element.innerHTML);
-            tiles[row][5].element.classList.add('letterRightShift');
+            player.tiles[row][5].activeTile(player.tiles[row][4].element.innerHTML);
+            player.tiles[row][5].element.classList.add('letterRightShift');
             for (c=4;c>0;c--) {
-                tiles[row][c].element.innerHTML = tiles[row][c-1].element.innerHTML;
-                tiles[row][c].element.classList.add('class', 'letterRightShift');
+                player.tiles[row][c].letter = player.tiles[row][c].element.innerHTML = player.tiles[row][c-1].element.innerHTML;
+                player.tiles[row][c].element.classList.add('class', 'letterRightShift');
             }
-            tiles[row][0].emptyBorder(EDGE);
+            player.tiles[row][0].emptyBorder(EDGE);
+            player.active_col = 5;
         }
         else if (col === 5) {
-            tiles[row][0].activeTile(tiles[row][1].element.innerHTML);
-            tiles[row][0].element.classList.add('letterLeftShift');
+            player.tiles[row][0].activeTile(player.tiles[row][1].element.innerHTML);
+            player.tiles[row][0].element.classList.add('letterLeftShift');
             for (c=1;c<5;c++) {
-                tiles[row][c].element.innerHTML = tiles[row][c+1].element.innerHTML;
-                tiles[row][c].element.classList.add('class', 'letterLeftShift');
+                player.tiles[row][c].letter = player.tiles[row][c].element.innerHTML = player.tiles[row][c+1].element.innerHTML;
+                player.tiles[row][c].element.classList.add('class', 'letterLeftShift');
             }
-            tiles[row][5].emptyBorder(EDGE);
+            player.tiles[row][5].emptyBorder(EDGE);
+            player.active_col = 0;
         }
-        score -= SHIFT_COST;
-        if (score < 0)
-            score = 0;
-        wordCount.innerHTML = score;
+        player.score -= SHIFT_COST;
+        if (player.score < 0)
+            player.score = 0;
+        wordCount.innerHTML = player.score;
     }
+    // Call this anyway to save the new active tile, even if we didn't shift
+    setCookie('player', player);
 }
 
 // Let the main function know where the active tile is
 function setActive(row, col) {
-    active_row = row;
-    active_col = col;
+    player.active_row = row;
+    player.active_col = col;
 }
 
 // Add the score animation
@@ -395,3 +432,17 @@ document.querySelector('.hideHelp').addEventListener('click', (e) => {
     e.stopPropagation();
     helpBox.close();
 });
+
+// Now for some cookie management!
+function setCookie(key, value) {
+    const valueString = JSON.stringify(value);
+    document.cookie = `${key}=${valueString}; SameSite=Strict`;
+    console.log(`Setting cookie ${key}=${valueString}`);
+}
+
+function getCookie(key) {
+    const cookie = document.cookie.split(';').filter((item) => item.trim().startsWith(`${key}=`));
+    if (cookie.length > 0)
+        return(JSON.parse(cookie[0].trim().slice(key.length+1)));
+    return(null);
+}
